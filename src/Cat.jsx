@@ -1,17 +1,36 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import COLORS from './data/colors.json';
 import VALID_STATUS_CODES from './data/validStatusCodes.json';
 
+
 const Cat = () => {
   const navigate = useNavigate();
   const [colorIdx, setColorIdx] = useState(0);
   const [delayChange, setDelayChange] = useState(5000);
-  const [statusChange, setStatusChange] = useState('418');
   const [delay, setDelay] = useState('');
   const [status, setStatus] = useState('');
+  // If there is a value for statusCode stored in localStorage,
+  // the component's statusChange state should be initialized
+  // to the value stored in localStorage
+  const [statusChange, setStatusChange] = useState(() => {
+    const serverCode = localStorage.getItem('statusCode');
+    console.log('serverCode:', serverCode);
+    return serverCode || '418'; // set statusChange = serverCode if truthy
+  });
+  // If there is no statusCode value stored in localStorage, then
+  // you should set the initial value of the statusChange to 418
 
+  // Any time the user sets a new statusCode, store that new statusCode
+  // in localStorage to persist the statusCode change.
+  useEffect(() => {
+    localStorage.setItem('statusCode', statusChange)
+  }, [statusChange])
+
+  // useEffect(() => {
+
+  // })
 
   const handleDelaySubmit = (e) => {
     e.preventDefault();
@@ -45,6 +64,17 @@ const Cat = () => {
     setStatusChange(status);
     setStatus('');
   };
+
+  useEffect(() => {
+    const colorInterval = setInterval(() => {
+      setColorIdx((prevIdx) => {
+        const newIdx = ++prevIdx % COLORS.length;
+        return newIdx;
+      });
+    }, delayChange);
+
+    return () => clearInterval(colorInterval);
+  }, [delayChange]);
 
   return (
     <div
