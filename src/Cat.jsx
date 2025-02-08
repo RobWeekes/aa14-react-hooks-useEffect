@@ -28,9 +28,15 @@ const Cat = () => {
     localStorage.setItem('statusCode', statusChange)
   }, [statusChange])
 
-  // useEffect(() => {
+  // BONUS: Reset status code after no activity (10 mins)
+  useEffect(() => {
+    const resetTimer = setTimeout(() => {
+      setStatusChange('418');
+      localStorage.setItem('statusCode', '418')
+    }, 10*60*1000)
 
-  // })
+    return () => clearTimeout(resetTimer);
+  }, [statusChange])
 
   const handleDelaySubmit = (e) => {
     e.preventDefault();
